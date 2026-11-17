@@ -12,6 +12,12 @@ builder.Services.AddDbContext<ProjectDb>(opt =>
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(o => o.AddPolicy("frontend", p => p
+    .WithOrigins("http://localhost:5173")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+));
+
 builder.Services
     .AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<ProjectDb>();
@@ -27,6 +33,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
