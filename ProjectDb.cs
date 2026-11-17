@@ -1,11 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Project.Models;
 
-class ProjectDb : DbContext
+public class ProjectDb(DbContextOptions<ProjectDb> options) 
+    : IdentityDbContext<IdentityUser>(options)
 {
-    public ProjectDb(DbContextOptions<ProjectDb> options)
-        : base(options) {}
-
     public DbSet<Workout> Workouts => Set<Workout>();
 
     public DbSet<Exercise> Exercises => Set<Exercise>();

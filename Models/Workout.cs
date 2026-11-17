@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace Project.Models;
 
 public class Workout
@@ -13,4 +15,8 @@ public class Workout
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<Exercise> Exercises { get; set; } = new List<Exercise>();
+
+    public required string UserId { get; set; }
+
+    public IdentityUser? User { get; set; }
 }
