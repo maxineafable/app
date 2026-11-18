@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { meQuery } from '@/lib/query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, Navigate, useNavigate } from '@tanstack/react-router'
 import { Link } from "@tanstack/react-router";
 import {
   User,
@@ -25,10 +26,10 @@ function RouteComponent() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // const queryClient = useQueryClient();
-
+  const queryClient = useQueryClient();
   const navigate = useNavigate()
 
+  const me = useQuery(meQuery)
 
   const mutation = useMutation({
     mutationFn: async (c: Credentials) => {
@@ -61,10 +62,10 @@ function RouteComponent() {
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     mutation.mutate({ email, password })
-
-    console.log(mutation.data)
-    console.log(mutation.error)
   }
+
+  if (me.isPending) return null
+  if (me.data) return <Navigate to="/" />
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -165,7 +166,7 @@ function RouteComponent() {
           <p className="mt-6 text-center text-sm text-slate-600">
             Already have an account?{" "}
             <Link
-              to="/"
+              to="/login"
               className="font-semibold text-pink-800 hover:text-pink-900"
             >
               Sign in

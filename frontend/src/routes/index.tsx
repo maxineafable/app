@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { meQuery } from '@/lib/query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, Link, Navigate, useNavigate } from '@tanstack/react-router'
 
 import {
   Plus,
@@ -33,19 +34,42 @@ export interface Workout {
 }
 
 function Index() {
-  const { data, isPending, error } = useQuery<Workout[]>({
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  const me = useQuery(meQuery)
+
+  const workouts = useQuery<Workout[]>({
     queryKey: ['workouts'],
+    enabled: !!me.data,
     queryFn: async () => {
       const res = await fetch('http://localhost:5044/workouts', {
         credentials: 'include',
       })
-      
+
       if (!res.ok)
         throw new Error("failed to fetch workouts");
 
       return res.json() as Promise<Workout[]>
-    }
+    },
   })
+
+  const logout = useMutation({
+    mutationFn: async () => {
+      await fetch('http://localhost:5044/logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(['me'], null)
+      queryClient.removeQueries({ queryKey: ['workouts'] })
+      navigate({ to: '/login' })
+    },
+  })
+
+  if (me.isPending) return <div className="">loading...</div>
+  if (!me.data) return <Navigate to='/login' />
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -55,16 +79,22 @@ function Index() {
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex size-9 items-center justify-center rounded-full bg-pink-400 font-semibold text-pink-950">
-                P
+                {me.data.email[0].toUpperCase()}
               </div>
 
               <div>
                 <h1 className="text-xl font-bold leading-tight">Workouts</h1>
-                <p className="text-xs text-slate-600">
-                  18 sessions logged this month
-                </p>
+                <p className="text-xs text-slate-600">{me.data.email}</p>
               </div>
             </div>
+
+            <button
+              onClick={() => logout.mutate()}
+              disabled={logout.isPending}
+              className="rounded-full bg-slate-50 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100"
+            >
+              Log out
+            </button>
           </div>
 
           <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5">
@@ -115,7 +145,7 @@ function Index() {
             </div>
 
             <div className="space-y-3">
-              {data?.map((workout) => (
+              {workouts.data?.map((workout) => (
                 <article
                   key={workout.id}
                   className="rounded-2xl border border-slate-200 p-4 shadow-sm"
