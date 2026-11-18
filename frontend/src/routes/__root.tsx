@@ -1,9 +1,12 @@
 import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 const RootLayout = () => (
   <>
-    <div className="p-2 flex gap-2">
+    {/* <div className="p-2 flex gap-2">
       <Link to="/" className="[&.active]:font-bold">
         Home
       </Link>{' '}
@@ -11,8 +14,10 @@ const RootLayout = () => (
         About
       </Link>
     </div>
-    <hr />
-    <Outlet />
+    <hr /> */}
+    <QueryClientProvider client={queryClient}>
+      <Outlet />
+    </QueryClientProvider>
     <TanStackRouterDevtools />
   </>
 )
