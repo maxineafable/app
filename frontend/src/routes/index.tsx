@@ -111,7 +111,7 @@ function Index() {
         <main className="flex-1 space-y-6 p-5 pb-28">
           {/* Start Workout */}
           <Link
-            to="/"
+            to="/workouts/new"
             className="flex items-center gap-3 rounded-2xl bg-pink-400 p-4 transition hover:bg-pink-500"
           >
             <div className="flex size-10 shrink-0 items-center justify-center bg-white rounded-full">
