@@ -8,7 +8,7 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ProjectDb>(opt =>
-    opt.UseInMemoryDatabase("ProjectDb"));
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddOpenApi();
 
