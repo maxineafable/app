@@ -15,12 +15,34 @@ builder.Services.AddOpenApi();
 builder.Services.AddCors(o => o.AddPolicy("frontend", p => p
     .WithOrigins("http://localhost:5173")
     .AllowAnyHeader()
-    .AllowAnyMethod()
+    .WithMethods("GET", "POST", "PUT", "DELETE")
+    .AllowCredentials()
 ));
 
 builder.Services
-    .AddIdentityApiEndpoints<IdentityUser>()
+    .AddIdentityApiEndpoints<IdentityUser>(o =>
+    {
+        o.User.RequireUniqueEmail = true;
+        o.Password.RequiredLength = 8;
+    })
     .AddEntityFrameworkStores<ProjectDb>();
+
+builder.Services.ConfigureApplicationCookie(o =>
+{
+    o.Cookie.Name = "project_auth";
+    o.Cookie.HttpOnly = true;
+    o.Cookie.SameSite = SameSiteMode.Lax;
+    o.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
+    o.ExpireTimeSpan = TimeSpan.FromDays(14);
+
+    o.Events.OnRedirectToLogin = ctx =>
+    {
+        ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+});
 
 builder.Services.AddAuthorization();
 
@@ -32,13 +54,18 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapIdentityApi<IdentityUser>();
+app.MapPost("/logout", async (SignInManager<IdentityUser> mgr) =>
+{
+    await mgr.SignOutAsync();
+    return Results.NoContent();
+}).RequireAuthorization();
 
 var workoutGroup = app.MapGroup("/workouts").RequireAuthorization();
 var exerciseGroup = app.MapGroup("/exercises").RequireAuthorization();
