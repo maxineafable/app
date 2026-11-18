@@ -8,6 +8,8 @@ import {
   ChevronRight,
   ArrowUpDown,
   Dumbbell,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 
 export const Route = createFileRoute('/')({
@@ -66,6 +68,21 @@ function Index() {
       queryClient.removeQueries({ queryKey: ['workouts'] })
       navigate({ to: '/login' })
     },
+  })
+
+  const deleteWorkout = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`http://localhost:5044/workouts/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+
+      if (!res.ok)
+        throw new Error("Error delete workout");
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['workouts'] })
+    }
   })
 
   if (me.isPending) return <div className="">loading...</div>
@@ -150,13 +167,31 @@ function Index() {
                   key={workout.id}
                   className="rounded-2xl border border-slate-200 p-4 shadow-sm"
                 >
-                  <div className="mb-3">
-                    <h3 className="text-[15px] font-bold">
-                      {workout.title}
-                    </h3>
-                    <p className="text-xs text-slate-600">
-                      {workout.date}
-                    </p>
+                  <div className="mb-3 flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="text-[15px] font-bold">{workout.title}</h3>
+                      <p className="text-xs text-slate-600">{workout.date}</p>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-4">
+                      <Link
+                        to="/workouts/$workoutId/edit"
+                        params={{ workoutId: String(workout.id) }}
+                        className="text-slate-500 hover:text-pink-700"
+                        title="Edit workout"
+                      >
+                        <Pencil size={17} />
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => deleteWorkout.mutate(workout.id)}
+                        className="text-slate-500 hover:text-red-600"
+                        title="Delete workout"
+                      >
+                        <Trash2 size={17} />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Exercises */}

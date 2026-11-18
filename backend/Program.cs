@@ -147,7 +147,9 @@ static async Task<IResult> UpdateWorkout(int id, ClaimsPrincipal principal, Upda
 {
     var userId = GetUserId(principal);
 
-    var workout = await db.Workouts.FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
+    var workout = await db.Workouts
+        .Include(w => w.Exercises)
+        .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
 
     if (workout is null)
         return TypedResults.NotFound();
@@ -155,6 +157,45 @@ static async Task<IResult> UpdateWorkout(int id, ClaimsPrincipal principal, Upda
     workout.Title = request.Title;
     workout.Note = request.Note;
     workout.Date = request.Date;
+
+    var existing = workout.Exercises.ToDictionary(e => e.Id);
+
+    if (request.Exercises.Any(e => e.Id is int exId && !existing.ContainsKey(exId)))
+        return TypedResults.BadRequest("Unknown exercise id.");
+
+    var keepIds = request.Exercises
+        .Where(e => e.Id.HasValue)
+        .Select(e => e.Id!.Value)
+        .ToHashSet();
+
+    db.Exercises.RemoveRange(workout.Exercises.Where(e => !keepIds.Contains(e.Id)));
+
+    foreach (var dto in request.Exercises)
+    {
+        if (dto.Id is int exId)
+        {
+            var exercise = existing[exId];
+            exercise.Name = dto.Name;
+            exercise.Note = dto.Note;
+            exercise.Sets = dto.Sets;
+            exercise.Reps = dto.Reps;
+            exercise.Weight = dto.Weight;
+            exercise.WeightUnit = dto.WeightUnit;
+        }
+        else
+        {
+            // added
+            workout.Exercises.Add(new Exercise
+            {
+                Name = dto.Name,
+                Note = dto.Note,
+                Sets = dto.Sets,
+                Reps = dto.Reps,
+                Weight = dto.Weight,
+                WeightUnit = dto.WeightUnit,
+            });
+        }
+    }
 
     await db.SaveChangesAsync();
 
