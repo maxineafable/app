@@ -1,6 +1,7 @@
+using Project.Features.Exercises.DTO;
 using Project.Models;
 
-namespace Project.DTOs;
+namespace Project.Features.Workouts.DTO;
 
 public class WorkoutResponse
 {

@@ -27,7 +27,7 @@ function RouteComponent() {
 
   const mutation = useMutation({
     mutationFn: async (c: Credentials) => {
-      const res = await fetch("/api/login?useCookies=true", {
+      const res = await fetch("/api/auth/login?useCookies=true", {
         method: 'POST',
         credentials: 'include',
         headers: {

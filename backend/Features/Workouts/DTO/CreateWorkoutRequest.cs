@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using Project.Features.Exercises.DTO;
 
-namespace Project.DTOs;
+namespace Project.Features.Workouts.DTO;
 
 public record CreateWorkoutRequest
 {

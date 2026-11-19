@@ -32,7 +32,7 @@ function RouteComponent() {
 
   const mutation = useMutation({
     mutationFn: async (c: Credentials) => {
-      const res = await fetch("/api/register", {
+      const res = await fetch("/api/auth/register", {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +43,7 @@ function RouteComponent() {
       if (!res.ok)
         throw new Error("Error creating an account");
 
-      const loginRes = await fetch("/api/login?useCookies=true", {
+      const loginRes = await fetch("/api/auth/login?useCookies=true", {
         method: 'POST',
         credentials: 'include',
         headers: {

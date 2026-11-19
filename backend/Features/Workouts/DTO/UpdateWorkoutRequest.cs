@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Project.Models;
 
+namespace Project.Features.Workouts.DTO;
+
 public record UpdateWorkoutRequest
 {
     [Required]
