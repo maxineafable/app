@@ -1,9 +1,8 @@
 import { meQuery } from '@/lib/query';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute, Navigate, useNavigate } from '@tanstack/react-router'
 import { Link } from "@tanstack/react-router";
 import {
-  User,
   Mail,
   LockKeyhole,
   Eye,
@@ -26,14 +25,14 @@ function RouteComponent() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const navigate = useNavigate()
 
   const me = useQuery(meQuery)
 
   const mutation = useMutation({
     mutationFn: async (c: Credentials) => {
-      const res = await fetch("http://localhost:5044/register", {
+      const res = await fetch("/api/register", {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +43,7 @@ function RouteComponent() {
       if (!res.ok)
         throw new Error("Error creating an account");
 
-      const loginRes = await fetch("http://localhost:5044/login?useCookies=true", {
+      const loginRes = await fetch("/api/login?useCookies=true", {
         method: 'POST',
         credentials: 'include',
         headers: {

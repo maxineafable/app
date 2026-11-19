@@ -60,15 +60,22 @@ app.UseCors("frontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapIdentityApi<IdentityUser>();
-app.MapPost("/logout", async (SignInManager<IdentityUser> mgr) =>
+using (var scope = app.Services.CreateScope())
+{
+    await scope.ServiceProvider.GetRequiredService<ProjectDb>().Database.MigrateAsync();
+}
+
+var api = app.MapGroup("/api");
+
+api.MapIdentityApi<IdentityUser>();
+api.MapPost("/logout", async (SignInManager<IdentityUser> mgr) =>
 {
     await mgr.SignOutAsync();
     return Results.NoContent();
 }).RequireAuthorization();
 
-var workoutGroup = app.MapGroup("/workouts").RequireAuthorization();
-var exerciseGroup = app.MapGroup("/exercises").RequireAuthorization();
+var workoutGroup = api.MapGroup("/workouts").RequireAuthorization();
+var exerciseGroup = api.MapGroup("/exercises").RequireAuthorization();
 
 workoutGroup.MapGet("/", GetAllWorkouts);
 workoutGroup.MapGet("/{id}", GetWorkout);
@@ -77,6 +84,8 @@ workoutGroup.MapPut("/{id}", UpdateWorkout);
 workoutGroup.MapDelete("/{id}", DeleteWorkout);
 
 exerciseGroup.MapGet("/", GetAllExercises);
+
+api.Map("/{**rest}", () => Results.NotFound());
 
 app.Run();
 

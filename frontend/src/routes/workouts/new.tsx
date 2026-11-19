@@ -74,7 +74,7 @@ function RouteComponent() {
 				exercises: workout.exercises.map(({ id, ...exercise }) => exercise)
 			}
 
-			const res = await fetch("http://localhost:5044/workouts", {
+			const res = await fetch("/api/workouts", {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
@@ -132,12 +132,9 @@ function RouteComponent() {
 		}));
 	};
 
-	// Save workout (connect TanStack Mutation later)
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		mutation.mutate()
-
-		console.log(workout);
 	};
 
 	if (me.isPending) return <div className="">loading...</div>

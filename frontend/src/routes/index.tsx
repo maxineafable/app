@@ -45,7 +45,7 @@ function Index() {
     queryKey: ['workouts'],
     enabled: !!me.data,
     queryFn: async () => {
-      const res = await fetch('http://localhost:5044/workouts', {
+      const res = await fetch('/api/workouts', {
         credentials: 'include',
       })
 
@@ -58,7 +58,7 @@ function Index() {
 
   const logout = useMutation({
     mutationFn: async () => {
-      await fetch('http://localhost:5044/logout', {
+      await fetch('/api/logout', {
         method: 'POST',
         credentials: 'include',
       })
@@ -72,7 +72,7 @@ function Index() {
 
   const deleteWorkout = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(`http://localhost:5044/workouts/${id}`, {
+      const res = await fetch(`/api/workouts/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       })
@@ -247,7 +247,7 @@ function Index() {
             </Link>
 
             <Link
-              to="/"
+              to="/workouts/new"
               className="flex flex-1 items-center justify-center gap-2 rounded-full bg-pink-400 py-2.5 text-sm font-medium text-pink-50 hover:bg-pink-500"
             >
               <Plus />

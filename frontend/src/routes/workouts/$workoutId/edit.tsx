@@ -64,7 +64,7 @@ function RouteComponent() {
     queryKey: ['workout', workoutId],
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      const res = await fetch(`http://localhost:5044/workouts/${workoutId}`, {
+      const res = await fetch(`/api/workouts/${workoutId}`, {
         credentials: 'include',
       });
 
@@ -96,9 +96,7 @@ function RouteComponent() {
         })),
       };
 
-      console.log('payload', payload)
-
-      const res = await fetch(`http://localhost:5044/workouts/${workoutId}`, {
+      const res = await fetch(`/api/workouts/${workoutId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -171,7 +169,7 @@ function RouteComponent() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     mutation.mutate();
     navigate({ to: '/' })
