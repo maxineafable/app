@@ -1,3 +1,5 @@
+import Footer from '@/components/main/footer';
+import { Button } from '@/components/ui/button';
 import { meQuery } from '@/lib/query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link, Navigate, useNavigate } from '@tanstack/react-router'
@@ -7,7 +9,6 @@ import {
   Search,
   ChevronRight,
   ArrowUpDown,
-  Dumbbell,
   Pencil,
   Trash2,
 } from "lucide-react";
@@ -88,119 +89,117 @@ function Index() {
   if (me.isPending) return <div className="">loading...</div>
   if (!me.data) return <Navigate to='/login' />
 
+  const workoutCount = workouts.data?.length
+
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-neutral-100 text-neutral-900">
       <div className="mx-auto flex min-h-screen max-w-md flex-col">
-        {/* Header */}
-        <header className="border-b border-slate-100 p-5">
+        <header className="border-b border-neutral-100 p-5">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex size-9 items-center justify-center rounded-full bg-pink-400 font-semibold text-pink-950">
+              <div className="flex size-9 items-center justify-center rounded-full bg-pink-400 font-semibold text-pink-800">
                 {me.data.email[0].toUpperCase()}
               </div>
 
               <div>
                 <h1 className="text-xl font-bold leading-tight">Workouts</h1>
-                <p className="text-xs text-slate-600">{me.data.email}</p>
+                <p className="text-xs text-neutral-600">{me.data.email}</p>
               </div>
             </div>
 
-            <button
+            <Button
               onClick={() => logout.mutate()}
               disabled={logout.isPending}
-              className="rounded-full bg-slate-50 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100"
+              variant="outline"
+              className="text-xs"
             >
               Log out
-            </button>
+            </Button>
           </div>
 
-          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5">
-            <Search size={19} className="shrink-0 text-slate-600" />
+          <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+            <Search size={19} className="shrink-0 text-neutral-600" />
             <input
               type="text"
               placeholder="Search workout title (e.g. Chest, Legs)..."
-              className="w-full bg-transparent text-sm outline-none placeholder:text-slate-500"
+              className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-500"
             />
           </div>
         </header>
 
-        {/* Content */}
         <main className="flex-1 space-y-6 p-5 pb-28">
-          {/* Start Workout */}
           <Link
             to="/workouts/new"
             className="flex items-center gap-3 rounded-2xl bg-pink-400 p-4 transition hover:bg-pink-500"
           >
             <div className="flex size-10 shrink-0 items-center justify-center bg-white rounded-full">
-              <Plus className='stroke-pink-500' />
+              <Plus className='stroke-pink-400' size={18} />
             </div>
 
             <div className="flex-1">
               <h2 className="font-semibold text-white">Start New Workout</h2>
               <p className="text-xs text-pink-200">
-                Choose routine or log an empty session
+                Create an empty session
               </p>
             </div>
 
-            <ChevronRight className='stroke-white' />
+            <ChevronRight className='stroke-white' size={18} />
           </Link>
 
-          {/* Previous Workouts */}
           <section>
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <h2 className="font-bold">Previous Workouts</h2>
-                <p className="text-xs text-slate-600">
-                  Showing 2 sessions sorted by latest
+                <p className="text-xs text-neutral-600">
+                  Showing {workoutCount} sessions sorted by latest
                 </p>
               </div>
 
-              <button className="flex items-center gap-1.5 rounded-full bg-slate-50 px-2.5 py-1 text-xs text-slate-600">
-                <ArrowUpDown size={14} />
+              <button className="flex items-center gap-1.5 rounded-full bg-neutral-50 px-2.5 py-1 text-xs text-neutral-600">
+                <ArrowUpDown size={16} />
                 Latest
               </button>
             </div>
 
             <div className="space-y-3">
               {workouts.data?.map((workout) => (
-                <article
+                <div
                   key={workout.id}
-                  className="rounded-2xl border border-slate-200 p-4 shadow-sm"
+                  className="rounded-2xl border border-neutral-200 p-4 shadow-sm"
                 >
                   <div className="mb-3 flex items-start justify-between gap-2">
                     <div>
                       <h3 className="text-[15px] font-bold">{workout.title}</h3>
-                      <p className="text-xs text-slate-600">{workout.date}</p>
+                      <p className="text-xs text-neutral-600">{workout.date}</p>
                     </div>
 
                     <div className="flex shrink-0 items-center gap-4">
                       <Link
                         to="/workouts/$workoutId/edit"
                         params={{ workoutId: String(workout.id) }}
-                        className="text-slate-500 hover:text-pink-700"
+                        className="text-neutral-500 hover:text-pink-500"
                         title="Edit workout"
                       >
-                        <Pencil size={17} />
+                        <Pencil size={18} />
                       </Link>
 
                       <button
                         type="button"
                         onClick={() => deleteWorkout.mutate(workout.id)}
-                        className="text-slate-500 hover:text-red-600"
+                        className="text-neutral-500 hover:text-red-500"
                         title="Delete workout"
                       >
-                        <Trash2 size={17} />
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </div>
 
-                  {/* Exercises */}
-                  <div className="border border-slate-200 bg-slate-50/50 px-3">
+                  <div className="border border-neutral-200 bg-neutral-50/50 px-3">
                     {workout.exercises.map((exercise, index) => (
                       <div
                         key={exercise.name}
                         className={`flex items-center justify-between gap-2 py-2.5 text-sm ${index !== workout.exercises.length - 1
-                          ? "border-b border-slate-200"
+                          ? "border-b border-neutral-200"
                           : ""
                           }`}
                       >
@@ -208,53 +207,33 @@ function Index() {
                           {exercise.name}
                         </span>
 
-                        <span className="shrink-0 font-mono text-xs text-slate-600">
+                        <span className="shrink-0 font-mono text-xs text-neutral-600">
                           {exercise.sets} sets · {exercise.weight} {exercise.weightUnit === 0 ? "kg" : "lb"}
                         </span>
                       </div>
                     ))}
                   </div>
 
-                  {/* Footer */}
                   <div className="mt-3 flex items-center justify-between text-xs">
-                    <span className="text-slate-600">
+                    <span className="text-neutral-600">
                       {workout.exercises.length} exercises
                     </span>
 
                     <Link
                       to="/"
                       params={{ workoutId: String(workout.id) }}
-                      className="font-semibold text-pink-700 hover:text-pink-900"
+                      className="font-semibold text-pink-800 hover:text-pink-900"
                     >
                       View details
                     </Link>
                   </div>
-                </article>
+                </div>
               ))}
             </div>
           </section>
         </main>
 
-        {/* Bottom Navigation */}
-        <nav className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-md px-5 pb-5">
-          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-2 shadow-lg">
-            <Link
-              to="/"
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-pink-50 py-2.5 text-sm font-medium hover:bg-pink-100 text-pink-800"
-            >
-              <Dumbbell />
-              Workouts
-            </Link>
-
-            <Link
-              to="/workouts/new"
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-pink-400 py-2.5 text-sm font-medium text-pink-50 hover:bg-pink-500"
-            >
-              <Plus />
-              Log
-            </Link>
-          </div>
-        </nav>
+        <Footer />
       </div>
     </div>
   )
